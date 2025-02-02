@@ -4,6 +4,7 @@ from barcode.writer import ImageWriter
 from openpyxl import load_workbook
 import os
 from openpyxl.drawing.image import Image
+from randomizer import sn_generator
 
 directory = "Barcodes"
 if not os.path.exists(directory):   #creates a directory to store the barcodes
@@ -20,11 +21,16 @@ if "Barcodes" not in file.columns:
 
 barcodes_col = file.columns.get_loc("Barcodes") + 1
 
+existing_barcodes = set(file["Barcodes"].dropna().astype(str))
+
 for index, row in file.iterrows():
     mac_address = row["Mac"]
     name = row["Name"]
 
-    barcode = Code128(mac_address, writer=ImageWriter())
+    serial_number = sn_generator()
+    
+
+    barcode = Code128(serial_number, writer=ImageWriter())
     file_name = os.path.join(directory, f"{name}")
     barcode.save(file_name)
     img = Image(f"{file_name}.png")
